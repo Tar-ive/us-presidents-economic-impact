@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US Presidents' Impact on Economy</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #121211;
+            color: #e0e0e0;
+        }
+        header {
+            background: linear-gradient(45deg, #39d16c, #195f39);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #1a1a1a;
+            padding: 10px;
+            flex-wrap: wrap;
+        }
+        nav button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        nav button:hover {
+            background-color: #555;
+        }
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #chartContainer {
+            width: 90%;
+            max-width: 1000px;
+            margin-top: 20px;
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        }
+        footer {
+            background: linear-gradient(60deg, #3ad26d, #1a5234);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: auto;
+        }
+        .comparison-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 600px;
+            margin-top: 20px;
+        }
+        .comparison-container select {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            width: 100%;
+            max-width: 300px;
+            background-color: #333;
+            color: white;
+        }
+        .comparison-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #3f51b5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        .comparison-container button:hover {
+            background-color: #303f9f;
+        }
+        .comparison-result {
+            margin-top: 20px;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 600px;
+        }
+        #description {
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+            width: 90%;
+            max-width: 1000px;
+        }
+        #sources {
+            margin-top: 20px;
+            font-size: 14px;
+            text-align: center;
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 1000px;
+        }
+        #sources a {
+            color: #3f51b5;
+            text-decoration: none;
+        }
+        #sources a:hover {
+            text-decoration: underline;
+        }
+        #additionalInfo {
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+            width: 90%;
+            max-width: 1000px;
+        }
+        #thoughtsList {
+            margin-top: 20px;
+        }
+        .thought {
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>US Presidents' Impact on Economy</h1>
+    </header>
+    <nav>
+        <button onclick="showPage('inflation')">Inflation</button>
+        <button onclick="showPage('stockReturn')">Stock Return</button>
+        <button onclick="showPage('comparison')">Term Comparison</button>
+        <button onclick="showPage('electionYears')">Election Year Swings</button>
+        <button onclick="showPage('futureImpacts')">Future Impacts</button>
+    </nav>
+    <main>
+        <div id="chartContainer">
+            <canvas id="chart"></canvas>
+        </div>
+        <div id="description"></div>
+
+        <div id="additionalInfo">
+            <h2>Additional Information and Thoughts</h2>
+            <div id="extraContent">
+                <p>This section contains extra information and personal thoughts about the economic impact of US Presidents.</p>
+                <ul>
+                    <li>The US inflation is the single most important event in all of democracy and it happens every 4 years.</li>
+                    <li>There is obviously a lot of misinformation and exaggeration but I believe only in data and facts.</li>
+                    <li>Data and facts are the things that keep the economy going and also what matters at the end of the day.</li>
+                    <li>Stock market performance:</li>
+                    <ul>
+                        <li>In the 23 election years since the S&P 500 index began, 19 years (83%) provided positive returns.</li>
+                        <li>The average S&P 500 return across all election years from 1928 to 2016 was 11.28%.</li>
+                        <li>When a Republican was elected, the average return was 15.3%.</li>
+                        <li>When a Democrat was elected, the average return was 7.6%.</li>
+                    </ul>
+                    <li>Economic conditions and incumbent party success:</li>
+                    <ul>
+                        <li>The incumbent party won in 13 out of 24 presidential elections studied.</li>
+                        <li>Only once did the incumbent party win when the election took place in a recession year (1948).</li>
+                        <li>In over 70% of incumbent party losses, the economy had been in recession that year or entered one within 12 months.</li>
+                    </ul>
+                </ul>
+            </div>
+        </div>
+        <div id="sources">
+            <h3>Sources:</h3>
+            <p>
+                <a href="https://smartasset.com/investing/inflation-calculator" target="_blank">SmartAsset Inflation Calculator</a> |
+                <a href="https://www.usinflationcalculator.com/inflation/historical-inflation-rates/" target="_blank">US Inflation Calculator</a> |
+                <a href="https://www.officialdata.org/us/stocks/s-p-500/1920" target="_blank">S&P 500 Historical Data</a> |
+                <a href="https://tradingeconomics.com/united-states/inflation-cpi" target="_blank">Trading Economics CPI</a> |
+                <a href="https://www.investopedia.com/us-inflation-rate-by-president-8546447" target="_blank">Investopedia US Inflation Rate by President</a>
+            </p>
+        </div>
+    </main>
+    <footer>
+        <p>Data visualization of US Presidents' Economic Impact | &copy; 2024 Saksham Adhikari</p>
+    </footer>
+
+    <script>
+        const presidentData = [
+            { year: 1921, president: "Warren G. Harding", party: "Republican", avgInflation: -4.933333333333334, spStart: 0, spReturn: 21.7 },
+            { year: 1923, president: "Calvin Coolidge", party: "Republican", avgInflation: 0.257142857142857, spStart: 0, spReturn: 230.9 },
+            { year: 1929, president: "Herbert Hoover", party: "Republican", avgInflation: -5.260000000000001, spStart: 0, spReturn: -77.1 },
+            { year: 1933, president: "Franklin D. Roosevelt", party: "Democratic", avgInflation: 2.1923076923076925, spStart: 0, spReturn: 187.7 },
+            { year: 1945, president: "Harry S. Truman", party: "Democratic", avgInflation: 4.866666666666666, spStart: 0, spReturn: 87.7 },
+            { year: 1953, president: "Dwight D. Eisenhower", party: "Republican", avgInflation: 1.3444444444444443, spStart: 0, spReturn: 129.5 },
+            { year: 1961, president: "John F. Kennedy", party: "Democratic", avgInflation: 1.0999999999999999, spStart: 0, spReturn: 29.0 },
+            { year: 1963, president: "Lyndon B. Johnson", party: "Democratic", avgInflation: 2.8428571428571425, spStart: 0, spReturn: 43.1 },
+            { year: 1969, president: "Richard Nixon", party: "Republican", avgInflation: 6.0, spStart: 0, spReturn: -24.2 },
+            { year: 1974, president: "Gerald Ford", party: "Republican", avgInflation: 8.100000000000001, spStart: 0, spReturn: 38.5 },
+            { year: 1977, president: "Jimmy Carter", party: "Democratic", avgInflation: 9.84, spStart: 0, spReturn: 28.2 },
+            { year: 1981, president: "Ronald Reagan", party: "Republican", avgInflation: 4.666666666666667, spStart: 133000, spReturn: 117.1 },
+            { year: 1989, president: "George H.W. Bush", party: "Republican", avgInflation: 4.08, spStart: 285400, spReturn: 51.0 },
+            { year: 1993, president: "Bill Clinton", party: "Democratic", avgInflation: 2.6333333333333333, spStart: 435230, spReturn: 210.5 },
+            { year: 2001, president: "George W. Bush", party: "Republican", avgInflation: 2.466666666666667, spStart: 1335630, spReturn: -39.6 },
+            { year: 2009, president: "Barack Obama", party: "Democratic", avgInflation: 1.4555555555555555, spStart: 865580, spReturn: 181.1 },
+            { year: 2017, president: "Donald Trump", party: "Republican", avgInflation: 2.44, spStart: 2275120, spReturn: 67.8 },
+            { year: 2021, president: "Joe Biden", party: "Democratic", avgInflation: 5.599999999999999, spStart: 3793750, spReturn: 23.5 },
+        ];
+
+        const electionYearSwings = [
+            { "year": 1928, "swing": 43.6 }, { "year": 1932, "swing": -8.6 }, { "year": 1936, "swing": 33.9 },
+            { "year": 1940, "swing": -9.8 }, { "year": 1944, "swing": 19.8 }, { "year": 1948, "swing": 5.0 },
+            { "year": 1952, "swing": 11.8 }, { "year": 1956, "swing": 6.6 }, { "year": 1960, "swing": 0.5 },
+            { "year": 1964, "swing": 16.5 }, { "year": 1968, "swing": 11.1 }, { "year": 1972, "swing": 19.0 },
+            { "year": 1976, "swing": 23.8 }, { "year": 1980, "swing": 32.4 }, { "year": 1984, "swing": 6.3 },
+            { "year": 1988, "swing": 16.8 }, { "year": 1992, "swing": 7.6 }, { "year": 1996, "swing": 23.1 },
+            { "year": 2000, "swing": -9.1 }, { "year": 2004, "swing": 10.9 }, { "year": 2008, "swing": -37.0 },
+            { "year": 2012, "swing": 16.0 }, { "year": 2016, "swing": 11.9 }, { "year": 2020, "swing": 18.4 }
+        ];
+
+        let chart;
+
+        function createChart(type, data, options) {
+            if (chart) {
+                chart.destroy();
+            }
+            const ctx = document.getElementById('chart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: type,
+                data: data,
+                options: options
+            });
+        }
+
+        function showPage(page) {
+            document.getElementById('chartContainer').innerHTML = '<canvas id="chart"></canvas>';
+            switch (page) {
+                case 'inflation':
+                    showInflationChart();
+                    break;
+                case 'stockReturn':
+                    showStockReturnChart();
+                    break;
+                case 'comparison':
+                    showComparisonTool();
+                    break;
+                case 'electionYears':
+                    showElectionYearSwingsChart();
+                    break;
+                case 'futureImpacts':
+                    showFutureImpacts();
+                    break;
+            }
+        }
+
+        function showInflationChart() {
+            const sortedData = presidentData.sort((a, b) => a.year - b.year);
+            const labels = sortedData.map(d => `${d.president} (${d.year})`);
+            const data = sortedData.map(d => d.avgInflation);
+            const backgroundColor = sortedData.map(d => d.party === 'Democratic' ? 'rgba(0, 0, 255, 0.6)' : 'rgba(255, 0, 0, 0.6)');
+
+            createChart('bar', {
+                labels: labels,
+                datasets: [{
+                    label: 'Average Inflation Rate (%)',
+                    data: data,
+                    backgroundColor: backgroundColor,
+                    borderColor: backgroundColor,
+                    borderWidth: 1
+                }]
+            }, {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Average Inflation Rate During Presidential Terms (1922-2024)',
+                        font: {
+                            size: 18
+                        }
+                    },
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Inflation: ${context.parsed.y.toFixed(2)}%`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Average Inflation Rate (%)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 90,
+                            minRotation: 90
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('description').innerHTML = `
+                <h2>Inflation During Presidential Terms</h2>
+                <p>This chart displays the average inflation rate during each president's term from 1922 to 2024. 
+                Blue bars represent Democratic presidents, while red bars represent Republican presidents. 
+                Higher bars indicate higher average inflation rates during the president's term.</p>
+                <p>Key observations:</p>
+                <ul>
+                    <li>The highest inflation rate was during Jimmy Carter's presidency (9.84%).</li>
+                    <li>The lowest inflation rate (actually deflation) was during Herbert Hoover's presidency (-5.26%).</li>
+                    <li>There's no clear pattern of one party consistently having higher or lower inflation rates.</li>
+                </ul>
+            `;
+        }
+
+        function showStockReturnChart() {
+            const sortedData = presidentData.sort((a, b) => a.year - b.year);
+            const labels = sortedData.map(d => `${d.president} (${d.year})`);
+            const data = sortedData.map(d => d.spReturn);
+            const backgroundColor = sortedData.map(d => d.party === 'Democratic' ? 'rgba(0, 0, 255, 0.6)' : 'rgba(255, 0, 0, 0.6)');
+
+            createChart('bar', {
+                labels: labels,
+                datasets: [{
+                    label: 'S&P 500 Return (%)',
+                    data: data,
+                    backgroundColor: backgroundColor,
+                    borderColor: backgroundColor,
+                    borderWidth: 1
+                }]
+            }, {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'S&P 500 Return During Presidential Terms',
+                        font: {
+                            size: 18
+                        }
+                    },
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `S&P 500 Return: ${context.parsed.y.toFixed(2)}%`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'S&P 500 Return (%)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 90,
+                            minRotation: 90
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('description').innerHTML = `
+                <h2>S&P 500 Return During Presidential Terms</h2>
+                <p>This chart displays the S&P 500 return during each president's term from 1922 to 2024. 
+                Blue bars represent Democratic presidents, while red bars represent Republican presidents. 
+                Higher bars indicate better stock market performance during the president's term.</p>
+                <p>Key observations:</p>
+                <ul>
+                    <li>The highest S&P 500 return was during Calvin Coolidge's presidency (230.9%).</li>
+                    <li>The lowest S&P 500 return was during Herbert Hoover's presidency (-77.1%).</li>
+                    <li>There's no clear pattern of one party consistently having higher or lower stock market returns.</li>
+                </ul>
+            `;
+        }
+
+        function showComparisonTool() {
+            document.getElementById('chartContainer').innerHTML = `
+                <div class="comparison-container">
+                    <form id="comparisonForm">
+                        <label for="president1">Select President 1:</label>
+                        <select id="president1">
+                            ${presidentData.map(president => `<option value="${president.president}">${president.president}</option>`).join('')}
+                        </select>
+                        <label for="president2">Select President 2:</label>
+                        <select id="president2">
+                            ${presidentData.map(president => `<option value="${president.president}">${president.president}</option>`).join('')}
+                        </select>
+                        <button type="button" onclick="comparePresidents()">Compare</button>
+                    </form>
+                    <div id="comparisonResult" class="comparison-result"></div>
+                </div>
+            `;
+            document.getElementById('description').innerHTML = `
+                <h2>Comparison Tool</h2>
+                <p>Select two presidents from the dropdown menus to compare their average inflation rates and S&P 500 returns during their terms.</p>
+            `;
+        }
+
+        function comparePresidents() {
+            const president1 = document.getElementById('president1').value;
+            const president2 = document.getElementById('president2').value;
+
+            const data1 = presidentData.find(president => president.president === president1);
+            const data2 = presidentData.find(president => president.president === president2);
+
+            let comparisonResult = `<h3>Comparison between ${president1} and ${president2}</h3>`;
+
+            if (data1.avgInflation > data2.avgInflation) {
+                comparisonResult += `<p>${president1} had a higher average inflation rate (${data1.avgInflation}%) compared to ${president2} (${data2.avgInflation}%).</p>`;
+            } else {
+                comparisonResult += `<p>${president1} had a lower average inflation rate (${data1.avgInflation}%) compared to ${president2} (${data2.avgInflation}%).</p>`;
+            }
+
+            if (data1.spReturn > data2.spReturn) {
+                comparisonResult += `<p>${president1} had a higher S&P 500 return (${data1.spReturn}%) compared to ${president2} (${data2.spReturn}%).</p>`;
+            } else {
+                comparisonResult += `<p>${president1} had a lower S&P 500 return (${data1.spReturn}%) compared to ${president2} (${data2.spReturn}%).</p>`;
+            }
+
+            document.getElementById('comparisonResult').innerHTML = comparisonResult;
+        }
+
+        function showElectionYearSwingsChart() {
+            const labels = electionYearSwings.map(d => d.year);
+            const data = electionYearSwings.map(d => d.swing);
+            const backgroundColor = data.map(d => d >= 0 ? 'rgba(0, 255, 0, 0.6)' : 'rgba(255, 0, 0, 0.6)');
+
+            createChart('bar', {
+                labels: labels,
+                datasets: [{
+                    label: 'S&P 500 Swing (%)',
+                    data: data,
+                    backgroundColor: backgroundColor
+                }]
+            }, {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Stock Market Swings in Election Years'
+                    }
+                },
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'S&P 500 Swing (%)'
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('description').innerHTML = `
+                <h2>Stock Market Swings in Election Years</h2>
+                <p>This chart shows the S&P 500 index swing (in percentage) during each election year. 
+                Green bars represent positive swings (market gains), while red bars represent negative swings (market losses). 
+                The data illustrates how the stock market has performed during election years throughout history.</p>
+            `;
+        }
+
+        function showFutureImpacts() {
+            document.getElementById('description').innerHTML = `
+                <h2>Future Impacts of Presidential Policies on the Economy</h2>
+                <p>While it's challenging to predict the exact future impacts of presidential policies on the economy, 
+                we can consider some key factors that are likely to influence economic outcomes:</p>
+                <ul>
+                    <li><strong>Fiscal Policy:</strong> Presidential decisions on government spending and taxation can have 
+                    significant effects on economic growth, inflation, and employment.</li>
+                    <li><strong>Monetary Policy:</strong> Although the Federal Reserve is independent, the president's 
+                    nominations to the Fed board can influence monetary policy, affecting interest rates and inflation.</li>
+                    <li><strong>Trade Policy:</strong> Presidential decisions on international trade agreements and tariffs 
+                    can impact various sectors of the economy and overall economic growth.</li>
+                    <li><strong>Regulatory Environment:</strong> Changes in regulations can affect business costs and 
+                    consumer protections, influencing economic activity across different industries.</li>
+                    <li><strong>Technology and Innovation:</strong> Presidential policies supporting research and
+                    development can drive technological advancements, which in turn can boost economic productivity and growth.</li>
+                    <li><strong>Social Policies:</strong> Presidential decisions on healthcare, education, and social welfare can affect workforce productivity and economic stability.</li>
+                </ul>
+                <p>Considering these factors, it is evident that presidential policies can have long-term and wide-ranging effects on the economy. Analysts and economists often study these areas to make informed predictions about future economic trends.</p>
+            `;
+            document.getElementById('chartContainer').innerHTML = ''; // Clear chart
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showInflationChart(); // Default to showing the inflation chart on page load
+        });
+    </script>
+</body>
+</html>
